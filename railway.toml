@@ -10,7 +10,7 @@ restartPolicyMaxRetries = 3
 
 [[services]]
 name = "ledger-service"
-internalPort = 8082
+internalPort = 3000
 
 [[services]]
 name = "ledger-grpc"
