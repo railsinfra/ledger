@@ -8,7 +8,7 @@ on:
       - staging
 
 env:
-  RUBY_VERSION: '3.3'
+  RUBY_VERSION: '3.3.0'
 
 jobs:
   test:
