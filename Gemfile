@@ -58,6 +58,9 @@ group :development, :test do
   
   # Load environment variables from .env files
   gem "dotenv-rails"
+
+  # Pin minitest to 5.x for Rails 7.1 test runner compatibility (minitest 6 changes run() signature)
+  gem "minitest", "~> 5.1"
 end
 
 group :development do

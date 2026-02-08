@@ -57,6 +57,7 @@ development:
 # Do not set this db to the same as development or production.
 test:
   <<: *default
+  url: <%= ENV["DATABASE_URL"] || "postgresql://localhost:5432/ledger_test" %>
   database: ledger_test
 
 # As with config/credentials.yml, you never want to store sensitive information,
@@ -81,4 +82,5 @@ test:
 #
 production:
   <<: *default
-  url: <%= ENV.fetch("DATABASE_URL") %>
+  # Only require DATABASE_URL when actually running in production (so test/dev can run without it set)
+  url: <%= ENV["RAILS_ENV"] == "production" ? ENV.fetch("DATABASE_URL") : (ENV["DATABASE_URL"] || "postgresql://localhost:5432/ledger_production") %>
