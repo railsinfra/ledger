@@ -21,13 +21,7 @@ class LedgerService < Rails::Ledger::V1::LedgerService::Service
     idempotency_key = request.idempotency_key.to_s
     correlation_id = request.correlation_id.to_s
 
-    Rails.logger.info(
-      "grpc_post_transaction_received " \
-      "org=#{organization_id.inspect} env=#{environment.inspect} " \
-      "source_raw=#{raw_source.inspect} dest_raw=#{raw_dest.inspect} " \
-      "source=#{source_external_account_id.inspect} dest=#{destination_external_account_id.inspect} " \
-      "tx=#{external_transaction_id.inspect} idem=#{idempotency_key.inspect}"
-    )
+    Rails.logger.info "[LEDGER_GRPC] post_transaction START org=#{organization_id} env=#{environment} amount=#{amount} #{currency} source=#{source_external_account_id} dest=#{destination_external_account_id} tx_id=#{external_transaction_id} idem=#{idempotency_key} correlation=#{correlation_id}"
 
     # Reject malformed requests early (avoids creating half-baked ledger rows).
     raise GRPC::InvalidArgument.new('organization_id is required') if organization_id.empty?
@@ -49,6 +43,7 @@ class LedgerService < Rails::Ledger::V1::LedgerService::Service
       correlation_id: correlation_id
     )
 
+    Rails.logger.info "[LEDGER_GRPC] post_transaction SUCCESS org=#{organization_id} env=#{environment} tx_id=#{external_transaction_id} ledger_id=#{result.id}"
     Rails::Ledger::V1::PostTransactionResponse.new(
       status: 'posted',
       ledger_transaction_id: result.id.to_s,
@@ -79,6 +74,7 @@ class LedgerService < Rails::Ledger::V1::LedgerService::Service
       end
     end
 
+    Rails.logger.warn "[LEDGER_GRPC] post_transaction FAILED tx_id=#{external_transaction_id rescue 'unknown'} error=#{e.class}: #{e.message}"
     Rails::Ledger::V1::PostTransactionResponse.new(
       status: 'failed',
       ledger_transaction_id: '',
@@ -92,26 +88,31 @@ class LedgerService < Rails::Ledger::V1::LedgerService::Service
     external_account_id = request.external_account_id
     currency = request.currency
 
-    account = LedgerAccount.find_by!(
+    Rails.logger.info "[LEDGER_GRPC] get_account_balance START org=#{organization_id} env=#{environment} account=#{external_account_id} currency=#{currency}"
+
+    account = LedgerAccount.find_by(
       organization_id: organization_id,
       environment: environment,
       external_account_id: external_account_id,
       currency: currency
     )
 
-    # Use AccountBalance.get_balance which filters by environment
-    balance = AccountBalance.get_balance(
-      organization_id: organization_id,
-      environment: environment,
-      ledger_account_id: account.id
-    )
+    # Industry standard: return 0 for new/unknown accounts (no prior activity)
+    balance = if account
+      AccountBalance.get_balance(
+        organization_id: organization_id,
+        environment: environment,
+        ledger_account_id: account.id
+      )
+    else
+      0
+    end
 
+    Rails.logger.info "[LEDGER_GRPC] get_account_balance SUCCESS org=#{organization_id} account=#{external_account_id} balance=#{balance}"
     Rails::Ledger::V1::GetAccountBalanceResponse.new(
       balance: balance.to_s,
       currency: currency
     )
-  rescue => e
-    raise GRPC::NotFound.new(e.message)
   end
 
   private

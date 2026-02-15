@@ -117,11 +117,29 @@ class LedgerPoster
   end
 
   def existing_result(transaction)
-    if transaction.posted?
-      transaction
-    else
-      raise IdempotencyError, "Transaction already exists but not posted"
+    return transaction if transaction.posted?
+
+    # Idempotent retry: Ledger row exists but was never posted (e.g. crash after create).
+    # Complete the double-entry and mark posted instead of raising.
+    complete_posting_for_existing!(transaction)
+  end
+
+  def complete_posting_for_existing!(ledger_transaction)
+    if ledger_transaction.ledger_entries.any?
+      raise IdempotencyError, "Transaction already exists with partial state; manual intervention required"
     end
+
+    source_account = resolve_ledger_account(@source_external_account_id, determine_source_account_type)
+    destination_account = resolve_ledger_account(@destination_external_account_id, determine_destination_account_type)
+
+    validate_account_types!(source_account, destination_account)
+    source_entry_type, destination_entry_type = create_double_entry!(
+      ledger_transaction, source_account, destination_account
+    )
+    update_balances!(source_account, destination_account, source_entry_type, destination_entry_type)
+    ledger_transaction.mark_as_posted!
+
+    ledger_transaction
   end
 
   def create_ledger_transaction!
