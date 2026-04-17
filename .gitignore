@@ -1,6 +1,6 @@
 .env
 .env.*
-!.env.dev.example
+!.env.example
 config/master.key
 .DS_Store
 /log/*

@@ -6,7 +6,7 @@ Thanks for contributing to `ledger`.
 
 1. Fork and clone the repository.
 2. Copy environment templates and configure local values:
-   - `cp .env.dev.example .env`
+   - `cp .env.example .env`
 3. Start required local dependencies (PostgreSQL, Ruby, Bundler).
 4. Run tests before opening a PR.
 

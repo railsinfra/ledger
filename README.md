@@ -68,7 +68,7 @@ Defined in `app/grpc/ledger_service.rb`:
 Use the provided example file (see also [`CONTRIBUTING.md`](CONTRIBUTING.md)):
 
 ```bash
-cp .env.dev.example .env
+cp .env.example .env
 ```
 
 Expected variables:
