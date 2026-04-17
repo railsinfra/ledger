@@ -11,7 +11,7 @@ if ENV['SENTRY_DSN'].present?
     config.environment = ENV.fetch('ENVIRONMENT', Rails.env)
     
     # Performance monitoring
-    config.traces_sample_rate = 0.1 # Sample 10% of transactions for MVP
+    config.traces_sample_rate = 0.1 # Sample 10% of transactions (tune per environment)
     
     # Filter sensitive data
     config.before_send = lambda do |event, hint|

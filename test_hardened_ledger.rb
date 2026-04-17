@@ -5,8 +5,8 @@ require 'bundler/setup'
 require 'active_record'
 require 'pg'
 
-# Load database config
-DATABASE_URL = "postgresql://REDACTED"
+# Load database config from environment with safe local default
+DATABASE_URL = ENV.fetch("LEDGER_DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/ledger_development")
 
 ActiveRecord::Base.establish_connection(
   adapter: 'postgresql',
