@@ -39,9 +39,10 @@ Base path: `/api/v1/ledger`
 - `GET /entries` - paginated ledger entries (`page`, `per_page`, optional `account_id`)
 - `GET /transactions` - recent transactions (optional `status`)
 - `GET /transactions/:id` - single transaction with entries
-- `GET /health` - service health check
+- `GET /health` - application health payload (JSON)
+- `GET /up` - Rails boot health check used by platforms such as Railway (returns 200 when the app boots cleanly)
 
-Auth behavior:
+### Auth behavior
 
 - Requires `Authorization: Bearer <jwt>`
 - Extracts `business_id` from JWT as organization scope
@@ -64,7 +65,7 @@ Defined in `app/grpc/ledger_service.rb`:
 
 ### Environment configuration
 
-Use the provided example file:
+Use the provided example file (see also [`CONTRIBUTING.md`](CONTRIBUTING.md)):
 
 ```bash
 cp .env.dev.example .env
@@ -122,7 +123,7 @@ When changing posting logic (`LedgerPoster`) or API behavior, add/update tests i
 
 ## Deployment
 
-- Service deployment config is in `railway.toml`.
+- Service deployment config is in `railway.toml` (including HTTP health checks against `/up`).
 - For production usage, ensure secure env var management and strict secret handling.
 - Keep migrations and deployment changes in sync with this service release.
 
