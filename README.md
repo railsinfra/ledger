@@ -7,10 +7,10 @@ Double-entry ledger microservice for posting and querying financial transactions
 This service is maintained as part of the open-source repository:
 
 - Project overview: [`README.md`](../../../README.md)
-- Contribution guide: [`CONTRIBUTING.md`](../../../CONTRIBUTING.md)
-- Code of conduct: [`CODE_OF_CONDUCT.md`](../../../CODE_OF_CONDUCT.md)
-- Security policy: [`SECURITY.md`](../../../SECURITY.md)
-- License: [`LICENSE`](../../../LICENSE)
+- Contribution guide: [`CONTRIBUTING.md`](CONTRIBUTING.md)
+- Code of conduct: [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md)
+- Security policy: [`SECURITY.md`](SECURITY.md)
+- License: [`LICENSE`](LICENSE)
 
 ## What This Service Does
 
@@ -82,6 +82,12 @@ Expected variables:
 
 For local development, use non-production credentials and local databases only.
 
+If your PostgreSQL database does not exist yet, create one before `db:prepare`:
+
+```bash
+createdb ledger_development || true
+```
+
 ### Install and run
 
 ```bash
@@ -119,3 +125,7 @@ When changing posting logic (`LedgerPoster`) or API behavior, add/update tests i
 - Service deployment config is in `railway.toml`.
 - For production usage, ensure secure env var management and strict secret handling.
 - Keep migrations and deployment changes in sync with this service release.
+
+## Security Reporting
+
+Please report vulnerabilities privately via [`SECURITY.md`](SECURITY.md). Do not open public issues for security disclosures.
